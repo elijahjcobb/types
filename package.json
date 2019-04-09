@@ -1,0 +1,46 @@
+{
+  "name": "@elijahjcobb/types",
+  "version": "0.0.2",
+  "description": "A runtime type checker built with and for TypeScript.",
+  "main": "dist/index",
+  "types": "dist/index",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "npm run compile",
+    "compile": "npm run clean && /usr/local/bin/tsc -p tsconfig.json",
+    "watch": "tsc -w -p .",
+    "clean": "rm -rf dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elijahjcobb/types.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "runtime",
+    "typescript",
+    "type",
+    "checker",
+    "validate",
+    "validator",
+    "check",
+    "kind"
+  ],
+  "author": "Elijah Cobb <elijah@elijahcobb.com> (https://elijahcobb.com/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/elijahjcobb/types/issues"
+  },
+  "homepage": "https://github.com/elijahjcobb/types#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "latest",
+    "typescript": "latest",
+    "tslint": "latest"
+  },
+  "files": [
+    "dist"
+  ]
+}
