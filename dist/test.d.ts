@@ -21,12 +21,4 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-
-import { ECTReport } from "./ECTReport";
-
-/**
- * A type representing the output of a validator.
- */
-export type ECTOutput = {
-	[key: string]: ECTReport | { passed: boolean, children: ECTOutput };
-};
+export {};

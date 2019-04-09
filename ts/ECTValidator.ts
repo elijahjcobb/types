@@ -61,14 +61,17 @@ export class ECTValidator {
 			let expectedValueType: ECTItem = this.types[key];
 			let actualValue: any = object[key];
 			let actualValueType: string = typeof actualValue;
+
 			if (actualValueType === "object" && Array.isArray(actualValue)) actualValueType = "array";
+			if (actualValueType === "array" && actualValue !== undefined && (actualValue as any[]).length === 0) actualValueType = "undefined";
+			if (actualValueType === "object" && actualValue !== undefined && (Object.keys(actualValue)).length === 0) actualValueType = "undefined";
 
 			if (actualValueType === "array") {
 
 				if (expectedValueType.type === "object") {
 
 					res[key] = {
-						expected: expectedValueType.type + "<" + expectedValueType.subtypes.join(" | ") + ">",
+						expected: expectedValueType.type,
 						data: "{}",
 						index: 0,
 						actual: "object",
@@ -80,7 +83,8 @@ export class ECTValidator {
 				}
 
 				let array: any[] = actualValue as any[];
-				let allowedTypes: string[] = expectedValueType.subtypes;
+
+				let allowedTypes: string[] = expectedValueType.subtypes as string[];
 
 				for (let j: number = 0; j < array.length; j++) {
 
@@ -90,7 +94,7 @@ export class ECTValidator {
 					if (allowedTypes.indexOf(itemType) === -1) {
 
 						res[key] = {
-							expected: expectedValueType.type + "<" + expectedValueType.subtypes.join(" | ") + ">",
+							expected: expectedValueType.type + "<" + (expectedValueType.subtypes as string[]).join(" | ") + ">",
 							data: item,
 							index: j,
 							actual: actualValueType + "<" + itemType + ">",
@@ -102,7 +106,7 @@ export class ECTValidator {
 					} else {
 
 						res[key] = {
-							expected: expectedValueType.type + "<" + expectedValueType.subtypes.join(" | ") + ">",
+							expected: expectedValueType.type + "<" + (expectedValueType.subtypes as string[]).join(" | ") + ">",
 							data: itemType,
 							actual: actualValueType + "<" + itemType + ">",
 							passed: true
@@ -119,7 +123,7 @@ export class ECTValidator {
 				if (expectedValueType.type === "array") {
 
 					res[key] = {
-						expected: expectedValueType.type + "<" + expectedValueType.subtypes.join(" | ") + ">",
+						expected: expectedValueType.type,
 						data: "[]",
 						index: 0,
 						actual: "array",
@@ -130,41 +134,37 @@ export class ECTValidator {
 
 				}
 
+				let objectKeys: string[] = Object.keys(actualValue);
 
-				let object: object = actualValue as object;
-				let allowedTypes: string[] = expectedValueType.subtypes;
-				let objectKeys: string[] = Object.keys(object);
+				let subRes: ECTOutput = {};
+
+				let passCount: number = 0;
 
 				for (let j: number = 0; j < objectKeys.length; j++) {
 
-					let itemKey: string = objectKeys[j];
-					let item: any = object[itemKey];
-					let itemType: string = typeof item;
+					let subKey: string = objectKeys[j];
+					let subValue: any = actualValue[subKey];
+					let subValueType: string = typeof subValue;
+					let expectedSubValueType: string = (expectedValueType.subtypes as ECTInput)[subKey].type;
 
-					if (allowedTypes.indexOf(itemType) === -1) {
 
-						res[key] = {
-							expected: expectedValueType.type + "<" + expectedValueType.subtypes.join(" | ") + ">",
-							data: item,
-							key: itemKey,
-							actual: actualValueType + "<" + itemType + ">",
-							passed: false
-						};
+					let passed: boolean = expectedSubValueType === subValueType && subValue !== null && subValue !== undefined;
 
-						break;
+					subRes[subKey] = {
+						expected: expectedSubValueType,
+						data: subValue,
+						actual: subValueType,
+						passed
+					};
 
-					} else {
-
-						res[key] = {
-							expected: expectedValueType.type + "<" + expectedValueType.subtypes.join(" | ") + ">",
-							data: itemType,
-							actual: actualValueType + "<" + itemType + ">",
-							passed: true
-						};
-
-					}
+					if (passed) passCount ++;
 
 				}
+
+				res[key] = {
+					passed: passCount >= objectKeys.length,
+					children: subRes
+				};
 
 			} else {
 
@@ -172,7 +172,7 @@ export class ECTValidator {
 					expected: expectedValueType.type,
 					data: actualValue,
 					actual: actualValueType,
-					passed: expectedValueType.type === actualValueType && actualValue !== null && actualValueType !== undefined
+					passed: expectedValueType.type === actualValueType && actualValue !== null && actualValue !== undefined
 				};
 
 			}

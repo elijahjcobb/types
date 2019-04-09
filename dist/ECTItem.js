@@ -34,11 +34,24 @@ class ECTItem {
      */
     constructor(type, subtypes) {
         this.type = type;
-        if ((type === "object" || type === "array") && subtypes !== undefined && subtypes !== null && subtypes.length === 0)
-            subtypes = [ECTItem.string(), ECTItem.number(), ECTItem.boolean()];
-        if (subtypes) {
-            this.subtypes = [];
-            subtypes.forEach((type) => this.subtypes.push(type.type));
+        if (subtypes !== undefined && subtypes !== null) {
+            if (subtypes["length"] === undefined) {
+                this.subtypes = subtypes;
+                Object.keys(this.subtypes).forEach((key) => {
+                    let type = this.subtypes[key];
+                    if (type.type === "object" || type.type === "array")
+                        throw new Error("Recursive type checking is not supported yet but it is in the works. You can't specify an object's subtype to be an object or array.");
+                });
+            }
+            else {
+                let values = [];
+                subtypes.forEach((type) => {
+                    if (type.type === "object" || type.type === "array")
+                        throw new Error("Recursive type checking is not supported yet but it is in the works. You can't specify an array's subtype to be an object or array.");
+                    values.push(type.type);
+                });
+                this.subtypes = values;
+            }
         }
     }
     /**
@@ -67,6 +80,6 @@ class ECTItem {
      * @param {ECTItem} types The types allowed for the object.
      * @return {ECTItem} A ECTItem instance.
      */
-    static object(...types) { return new ECTItem("object", types); }
+    static object(types) { return new ECTItem("object", types); }
 }
 exports.ECTItem = ECTItem;

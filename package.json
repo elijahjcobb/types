@@ -1,6 +1,6 @@
 {
   "name": "@elijahjcobb/types",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A runtime type checker built with and for TypeScript.",
   "main": "dist/index",
   "types": "dist/index",

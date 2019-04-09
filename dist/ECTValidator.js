@@ -49,10 +49,14 @@ class ECTValidator {
             let actualValueType = typeof actualValue;
             if (actualValueType === "object" && Array.isArray(actualValue))
                 actualValueType = "array";
+            if (actualValueType === "array" && actualValue !== undefined && actualValue.length === 0)
+                actualValueType = "undefined";
+            if (actualValueType === "object" && actualValue !== undefined && (Object.keys(actualValue)).length === 0)
+                actualValueType = "undefined";
             if (actualValueType === "array") {
                 if (expectedValueType.type === "object") {
                     res[key] = {
-                        expected: expectedValueType.type + "<" + expectedValueType.subtypes.join(" | ") + ">",
+                        expected: expectedValueType.type,
                         data: "{}",
                         index: 0,
                         actual: "object",
@@ -88,7 +92,7 @@ class ECTValidator {
             else if (actualValueType === "object") {
                 if (expectedValueType.type === "array") {
                     res[key] = {
-                        expected: expectedValueType.type + "<" + expectedValueType.subtypes.join(" | ") + ">",
+                        expected: expectedValueType.type,
                         data: "[]",
                         index: 0,
                         actual: "array",
@@ -96,39 +100,35 @@ class ECTValidator {
                     };
                     continue;
                 }
-                let object = actualValue;
-                let allowedTypes = expectedValueType.subtypes;
-                let objectKeys = Object.keys(object);
+                let objectKeys = Object.keys(actualValue);
+                let subRes = {};
+                let passCount = 0;
                 for (let j = 0; j < objectKeys.length; j++) {
-                    let itemKey = objectKeys[j];
-                    let item = object[itemKey];
-                    let itemType = typeof item;
-                    if (allowedTypes.indexOf(itemType) === -1) {
-                        res[key] = {
-                            expected: expectedValueType.type + "<" + expectedValueType.subtypes.join(" | ") + ">",
-                            data: item,
-                            key: itemKey,
-                            actual: actualValueType + "<" + itemType + ">",
-                            passed: false
-                        };
-                        break;
-                    }
-                    else {
-                        res[key] = {
-                            expected: expectedValueType.type + "<" + expectedValueType.subtypes.join(" | ") + ">",
-                            data: itemType,
-                            actual: actualValueType + "<" + itemType + ">",
-                            passed: true
-                        };
-                    }
+                    let subKey = objectKeys[j];
+                    let subValue = actualValue[subKey];
+                    let subValueType = typeof subValue;
+                    let expectedSubValueType = expectedValueType.subtypes[subKey].type;
+                    let passed = expectedSubValueType === subValueType && subValue !== null && subValue !== undefined;
+                    subRes[subKey] = {
+                        expected: expectedSubValueType,
+                        data: subValue,
+                        actual: subValueType,
+                        passed
+                    };
+                    if (passed)
+                        passCount++;
                 }
+                res[key] = {
+                    passed: passCount >= objectKeys.length,
+                    children: subRes
+                };
             }
             else {
                 res[key] = {
                     expected: expectedValueType.type,
                     data: actualValue,
                     actual: actualValueType,
-                    passed: expectedValueType.type === actualValueType && actualValue !== null && actualValueType !== undefined
+                    passed: expectedValueType.type === actualValueType && actualValue !== null && actualValue !== undefined
                 };
             }
         }

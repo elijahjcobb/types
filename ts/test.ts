@@ -22,11 +22,27 @@
  *
  */
 
-import { ECTReport } from "./ECTReport";
+import { ECTItem, ECTValidator } from "./index";
 
-/**
- * A type representing the output of a validator.
- */
-export type ECTOutput = {
-	[key: string]: ECTReport | { passed: boolean, children: ECTOutput };
-};
+let validator: ECTValidator = new ECTValidator({
+	obj: ECTItem.object({
+		foo: ECTItem.string(),
+		bar: ECTItem.number(),
+	}),
+	foo: ECTItem.string(),
+	nums: ECTItem.array(ECTItem.number())
+});
+
+
+console.dir(validator.inspect({
+	obj: {
+		foo: "Hello, World!",
+		bar: "wfeewe"
+	},
+	foo: "Hello",
+	nums: [
+		1,
+		2,
+		3
+	]
+}), { depth: null });

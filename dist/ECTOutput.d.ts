@@ -26,5 +26,8 @@ import { ECTReport } from "./ECTReport";
  * A type representing the output of a validator.
  */
 export declare type ECTOutput = {
-    [key: string]: ECTReport;
+    [key: string]: ECTReport | {
+        passed: boolean;
+        children: ECTOutput;
+    };
 };

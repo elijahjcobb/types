@@ -21,18 +21,19 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
+import { ECTInput } from "./ECTInput";
 /**
  * A class representing a value for a key in a structure.
  */
 export declare class ECTItem {
     readonly type: string;
-    readonly subtypes: string[];
+    readonly subtypes: string[] | ECTInput;
     /**
      * Create an ECTItem instance.
      * @param {string} type The type.
      * @param {ECTItem[]} subtypes The subtypes.
      */
-    constructor(type: string, subtypes?: ECTItem[]);
+    constructor(type: string, subtypes?: ECTItem[] | ECTInput);
     /**
      * An ECTItem for a string.
      * @return {ECTItem} A ECTItem instance.
@@ -59,5 +60,5 @@ export declare class ECTItem {
      * @param {ECTItem} types The types allowed for the object.
      * @return {ECTItem} A ECTItem instance.
      */
-    static object(...types: ECTItem[]): ECTItem;
+    static object(types: ECTInput): ECTItem;
 }

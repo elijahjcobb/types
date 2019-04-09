@@ -20,7 +20,10 @@ let validator: ECTValidator = new ECTValidator({
 	age: ECTItem.number(), // allows number
 	agreesItIsTimeToGetIll: ECTItem.boolean(), // allows boolean
 	tags: ECTItem.array(ECTItem.string(), ECTItem.number()), // allows string or number as values of an array
-	options: ECTItem.object(ECTItem.boolean()) // allows boolean as values of an object
+	options: ECTItem.object({
+	    darkMode: ECTItem.boolean(), // allows boolean
+	    timeout: ECTItem.number() // allows number
+	}) // checks each key in the object
 });
 ```
 
@@ -36,7 +39,7 @@ let exampleValues: object = {
 	birthYear: 1999,
 	agreesItIsTimeToGetIll: true,
 	tags: [ 1, "two"],
-	options: { darkMode: true }
+	options: { darkMode: true, timeout: 123 }
 };
 
 let output: ECTOutput = validator.inspect(exampleValues);
@@ -54,7 +57,7 @@ let res: boolean = validator.doesFail(exampleValues);
 
 ## Output Structure
 The `ECTOutput` will return an object with the same keys as the one you give it. However,
-instead of the value you provided, it will be an object with the attributes in the example below.
+instead of the value you provided, it will be an object with the attributes in the example below. On an object type it will respond each key with the format below.
 ```
 {
     firstName: {

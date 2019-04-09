@@ -1,3 +1,4 @@
+"use strict";
 /**
  *
  * Elijah Cobb
@@ -21,12 +22,25 @@
  * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
-
-import { ECTReport } from "./ECTReport";
-
-/**
- * A type representing the output of a validator.
- */
-export type ECTOutput = {
-	[key: string]: ECTReport | { passed: boolean, children: ECTOutput };
-};
+Object.defineProperty(exports, "__esModule", { value: true });
+const index_1 = require("./index");
+let validator = new index_1.ECTValidator({
+    obj: index_1.ECTItem.object({
+        foo: index_1.ECTItem.string(),
+        bar: index_1.ECTItem.number(),
+    }),
+    foo: index_1.ECTItem.string(),
+    nums: index_1.ECTItem.array(index_1.ECTItem.number())
+});
+console.dir(validator.inspect({
+    obj: {
+        foo: "Hello, World!",
+        bar: "wfeewe"
+    },
+    foo: "Hello",
+    nums: [
+        1,
+        2,
+        3
+    ]
+}), { depth: null });

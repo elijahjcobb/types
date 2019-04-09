@@ -22,29 +22,51 @@
  *
  */
 
+import { ECTInput } from "./ECTInput";
+
 /**
  * A class representing a value for a key in a structure.
  */
 export class ECTItem {
 
 	public readonly type: string;
-	public readonly subtypes: string[];
+	public readonly subtypes: string[] | ECTInput;
 
 	/**
 	 * Create an ECTItem instance.
 	 * @param {string} type The type.
 	 * @param {ECTItem[]} subtypes The subtypes.
 	 */
-	public constructor(type: string, subtypes?: ECTItem[]) {
+	public constructor(type: string, subtypes?: ECTItem[] | ECTInput) {
 
 		this.type = type;
 
-		if ((type === "object" || type === "array") && subtypes !== undefined && subtypes !== null && subtypes.length === 0) subtypes = [ECTItem.string(), ECTItem.number(), ECTItem.boolean()];
+		if (subtypes !== undefined && subtypes !== null) {
 
-		if (subtypes) {
+			if (subtypes["length"] === undefined) {
 
-			this.subtypes = [];
-			subtypes.forEach((type: ECTItem) => this.subtypes.push(type.type));
+				this.subtypes = subtypes as ECTInput;
+
+				Object.keys(this.subtypes).forEach((key: string) => {
+
+					let type: ECTItem = this.subtypes[key];
+					if (type.type === "object" || type.type === "array") throw new Error("Recursive type checking is not supported yet but it is in the works. You can't specify an object's subtype to be an object or array.");
+
+				});
+
+			} else {
+
+				let values: string[] = [];
+				(subtypes as ECTItem[]).forEach((type: ECTItem) => {
+
+					if (type.type === "object" || type.type === "array") throw new Error("Recursive type checking is not supported yet but it is in the works. You can't specify an array's subtype to be an object or array.");
+
+					values.push(type.type);
+				});
+
+				this.subtypes = values;
+
+			}
 
 		}
 
@@ -80,6 +102,6 @@ export class ECTItem {
 	 * @param {ECTItem} types The types allowed for the object.
 	 * @return {ECTItem} A ECTItem instance.
 	 */
-	public static object(...types: ECTItem[]): ECTItem { return new ECTItem("object", types); }
+	public static object(types: ECTInput): ECTItem { return new ECTItem("object", types); }
 
 }
