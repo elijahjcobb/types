@@ -23,6 +23,8 @@
  *
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+const error_1 = require("@elijahjcobb/error");
+const console_1 = require("@elijahjcobb/console");
 /**
  * A class to validate an object with a structure.
  */
@@ -47,12 +49,17 @@ class ECTValidator {
             let expectedValueType = this.types[key];
             let actualValue = object[key];
             let actualValueType = typeof actualValue;
+            let isOptional = expectedValueType.optional;
             if (actualValueType === "object" && Array.isArray(actualValue))
                 actualValueType = "array";
             if (actualValueType === "array" && actualValue !== undefined && actualValue.length === 0)
                 actualValueType = "undefined";
             if (actualValueType === "object" && actualValue !== undefined && (Object.keys(actualValue)).length === 0)
                 actualValueType = "undefined";
+            if (isOptional && (actualValue === undefined || actualValue === null))
+                continue;
+            if (expectedValueType.type === "any" && actualValue !== undefined && actualValue !== null)
+                continue;
             if (actualValueType === "array") {
                 if (expectedValueType.type === "object") {
                     res[key] = {
@@ -107,7 +114,12 @@ class ECTValidator {
                     let subKey = objectKeys[j];
                     let subValue = actualValue[subKey];
                     let subValueType = typeof subValue;
-                    let expectedSubValueType = expectedValueType.subtypes[subKey].type;
+                    let expectedSubValue = expectedValueType.subtypes[subKey];
+                    let expectedSubValueType = expectedSubValue.type;
+                    if (expectedSubValueType === "*" && subValue !== undefined && subValue !== null)
+                        continue;
+                    if (expectedSubValue.optional && (subValue === undefined || subValue === null))
+                        continue;
                     let passed = expectedSubValueType === subValueType && subValue !== null && subValue !== undefined;
                     subRes[subKey] = {
                         expected: expectedSubValueType,
@@ -158,6 +170,40 @@ class ECTValidator {
      */
     doesFail(object) {
         return Object.keys(this.getFailures(object)).length > 0;
+    }
+    /**
+     * Pretty print the inspection of an object using @elijahjcobb/console package.
+     * @param {object} object The object to print the inspection of.
+     */
+    print(object) {
+        console_1.default(this.inspect(object));
+    }
+    /**
+     * Verify the object and throw an ECErrorStack instance if it is incorrect.
+     * @param {object} object An object to inspect.
+     */
+    verify(object) {
+        let fails = this.getFailures(object);
+        let errorMessage = [];
+        let failingKeys = Object.keys(fails);
+        failingKeys.forEach((key) => {
+            let failingValue = fails[key];
+            if (failingValue["children"]) {
+                let value = failingValue;
+                let childrenKeys = Object.keys(value.children);
+                childrenKeys.forEach((childKey) => {
+                    let childValue = value.children[childKey];
+                    if (!childValue.passed)
+                        errorMessage.push(`Value '${childValue.data}' for key '${childKey}' in object '${key}' is incorrect type (expected: '${childValue.expected}' actual: '${childValue.actual}').`);
+                });
+            }
+            else {
+                let value = failingValue;
+                errorMessage.push(`Value '${value.data}' for key '${key}' is incorrect type (expected: '${value.expected}' actual: '${value.actual}').`);
+            }
+        });
+        if (errorMessage.length > 0)
+            throw error_1.ECErrorStack.newWithMessageAndType(error_1.ECErrorOriginType.FrontEnd, error_1.ECErrorType.ParameterIncorrectFormat, new Error(errorMessage.join(" ")));
     }
 }
 exports.ECTValidator = ECTValidator;

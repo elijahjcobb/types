@@ -26,18 +26,17 @@ import { ECTItem, ECTValidator } from "./index";
 
 let validator: ECTValidator = new ECTValidator({
 	obj: ECTItem.object({
-		foo: ECTItem.string(),
+		foo: ECTItem.string(true),
 		bar: ECTItem.number(),
-	}),
+	}, false),
 	foo: ECTItem.string(),
-	nums: ECTItem.array(ECTItem.number())
+	nums: ECTItem.array([ECTItem.number()])
 });
 
 
 console.dir(validator.inspect({
 	obj: {
-		foo: "Hello, World!",
-		bar: "wfeewe"
+		bar: 12
 	},
 	foo: "Hello",
 	nums: [

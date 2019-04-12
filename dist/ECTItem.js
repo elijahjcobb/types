@@ -30,10 +30,12 @@ class ECTItem {
     /**
      * Create an ECTItem instance.
      * @param {string} type The type.
+     * @param {boolean} optional Whether it is optional.
      * @param {ECTItem[]} subtypes The subtypes.
      */
-    constructor(type, subtypes) {
+    constructor(type, optional, subtypes) {
         this.type = type;
+        this.optional = optional;
         if (subtypes !== undefined && subtypes !== null) {
             if (subtypes["length"] === undefined) {
                 this.subtypes = subtypes;
@@ -55,31 +57,42 @@ class ECTItem {
         }
     }
     /**
-     * An ECTItem for a string.
+     * An ECTItem for any.
+     * @param optional Whether it is optional.
      * @return {ECTItem} A ECTItem instance.
      */
-    static string() { return new ECTItem("string"); }
+    static any(optional = false) { return new ECTItem("any", optional); }
+    /**
+     * An ECTItem for a string.
+     * @param optional Whether it is optional.
+     * @return {ECTItem} A ECTItem instance.
+     */
+    static string(optional = false) { return new ECTItem("string", optional); }
     /**
      * An ECTItem for a number.
+     * @param optional Whether it is optional.
      * @return {ECTItem} A ECTItem instance.
      */
-    static number() { return new ECTItem("number"); }
+    static number(optional = false) { return new ECTItem("number", optional); }
     /**
      * An ECTItem for a boolean.
+     * @param optional Whether it is optional.
      * @return {ECTItem} A ECTItem instance.
      */
-    static boolean() { return new ECTItem("boolean"); }
+    static boolean(optional = false) { return new ECTItem("boolean", optional); }
     /**
      * An ECTItem for an array.
+     * @param optional Whether it is optional
      * @param {ECTItem} types The types allowed for the array.
      * @return {ECTItem} A ECTItem instance.
      */
-    static array(...types) { return new ECTItem("array", types); }
+    static array(types, optional = false) { return new ECTItem("array", optional, types); }
     /**
      * An ECTItem for an object.
+     * @param optional Whether it is optional.
      * @param {ECTItem} types The types allowed for the object.
      * @return {ECTItem} A ECTItem instance.
      */
-    static object(types) { return new ECTItem("object", types); }
+    static object(types, optional = false) { return new ECTItem("object", optional, types); }
 }
 exports.ECTItem = ECTItem;

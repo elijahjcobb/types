@@ -28,37 +28,50 @@ import { ECTInput } from "./ECTInput";
 export declare class ECTItem {
     readonly type: string;
     readonly subtypes: string[] | ECTInput;
+    readonly optional: boolean;
     /**
      * Create an ECTItem instance.
      * @param {string} type The type.
+     * @param {boolean} optional Whether it is optional.
      * @param {ECTItem[]} subtypes The subtypes.
      */
-    constructor(type: string, subtypes?: ECTItem[] | ECTInput);
+    constructor(type: string, optional: boolean, subtypes?: ECTItem[] | ECTInput);
+    /**
+     * An ECTItem for any.
+     * @param optional Whether it is optional.
+     * @return {ECTItem} A ECTItem instance.
+     */
+    static any(optional?: boolean): ECTItem;
     /**
      * An ECTItem for a string.
+     * @param optional Whether it is optional.
      * @return {ECTItem} A ECTItem instance.
      */
-    static string(): ECTItem;
+    static string(optional?: boolean): ECTItem;
     /**
      * An ECTItem for a number.
+     * @param optional Whether it is optional.
      * @return {ECTItem} A ECTItem instance.
      */
-    static number(): ECTItem;
+    static number(optional?: boolean): ECTItem;
     /**
      * An ECTItem for a boolean.
+     * @param optional Whether it is optional.
      * @return {ECTItem} A ECTItem instance.
      */
-    static boolean(): ECTItem;
+    static boolean(optional?: boolean): ECTItem;
     /**
      * An ECTItem for an array.
+     * @param optional Whether it is optional
      * @param {ECTItem} types The types allowed for the array.
      * @return {ECTItem} A ECTItem instance.
      */
-    static array(...types: ECTItem[]): ECTItem;
+    static array(types: ECTItem[], optional?: boolean): ECTItem;
     /**
      * An ECTItem for an object.
+     * @param optional Whether it is optional.
      * @param {ECTItem} types The types allowed for the object.
      * @return {ECTItem} A ECTItem instance.
      */
-    static object(types: ECTInput): ECTItem;
+    static object(types: ECTInput, optional?: boolean): ECTItem;
 }

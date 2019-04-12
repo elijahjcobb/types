@@ -15,15 +15,15 @@ import {
 import { ECTValidator, ECTItem } from "@elijahjcobb/types";
 
 let validator: ECTValidator = new ECTValidator({
-	firstName: ECTItem.string(), // allows string
+	firstName: ECTItem.string(true), // allows string but is optional
 	lastName: ECTItem.string(), // allows string
 	age: ECTItem.number(), // allows number
 	agreesItIsTimeToGetIll: ECTItem.boolean(), // allows boolean
-	tags: ECTItem.array(ECTItem.string(), ECTItem.number()), // allows string or number as values of an array
+	tags: ECTItem.array(false, ECTItem.string(), ECTItem.number()), // allows string or number as values of an array and is required
 	options: ECTItem.object({
 	    darkMode: ECTItem.boolean(), // allows boolean
 	    timeout: ECTItem.number() // allows number
-	}) // checks each key in the object
+	}, false) // checks each key in the object and is required
 });
 ```
 

@@ -26,16 +26,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const index_1 = require("./index");
 let validator = new index_1.ECTValidator({
     obj: index_1.ECTItem.object({
-        foo: index_1.ECTItem.string(),
+        foo: index_1.ECTItem.string(true),
         bar: index_1.ECTItem.number(),
-    }),
+    }, false),
     foo: index_1.ECTItem.string(),
-    nums: index_1.ECTItem.array(index_1.ECTItem.number())
+    nums: index_1.ECTItem.array([index_1.ECTItem.number()])
 });
 console.dir(validator.inspect({
     obj: {
-        foo: "Hello, World!",
-        bar: "wfeewe"
+        bar: 12
     },
     foo: "Hello",
     nums: [

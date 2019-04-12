@@ -51,4 +51,14 @@ export declare class ECTValidator {
      * @return {boolean} Whether it fails.
      */
     doesFail(object: object): boolean;
+    /**
+     * Pretty print the inspection of an object using @elijahjcobb/console package.
+     * @param {object} object The object to print the inspection of.
+     */
+    print(object: object): void;
+    /**
+     * Verify the object and throw an ECErrorStack instance if it is incorrect.
+     * @param {object} object An object to inspect.
+     */
+    verify(object: object): void;
 }

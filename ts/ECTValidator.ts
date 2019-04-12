@@ -26,6 +26,8 @@ import { ECTReport } from "./ECTReport";
 import { ECTItem } from "./ECTItem";
 import { ECTOutput } from "./ECTOutput";
 import { ECTInput } from "./ECTInput";
+import { ECErrorStack, ECErrorOriginType, ECErrorType } from "@elijahjcobb/error";
+import ECConsole from "@elijahjcobb/console";
 
 /**
  * A class to validate an object with a structure.
@@ -61,10 +63,13 @@ export class ECTValidator {
 			let expectedValueType: ECTItem = this.types[key];
 			let actualValue: any = object[key];
 			let actualValueType: string = typeof actualValue;
+			let isOptional: boolean = expectedValueType.optional;
 
 			if (actualValueType === "object" && Array.isArray(actualValue)) actualValueType = "array";
 			if (actualValueType === "array" && actualValue !== undefined && (actualValue as any[]).length === 0) actualValueType = "undefined";
 			if (actualValueType === "object" && actualValue !== undefined && (Object.keys(actualValue)).length === 0) actualValueType = "undefined";
+			if (isOptional && (actualValue === undefined || actualValue === null)) continue;
+			if (expectedValueType.type === "any" && actualValue !== undefined && actualValue !== null) continue;
 
 			if (actualValueType === "array") {
 
@@ -145,7 +150,10 @@ export class ECTValidator {
 					let subKey: string = objectKeys[j];
 					let subValue: any = actualValue[subKey];
 					let subValueType: string = typeof subValue;
-					let expectedSubValueType: string = (expectedValueType.subtypes as ECTInput)[subKey].type;
+					let expectedSubValue: ECTItem = (expectedValueType.subtypes as ECTInput)[subKey];
+					let expectedSubValueType: string = expectedSubValue.type;
+					if (expectedSubValueType === "*" && subValue !== undefined && subValue !== null) continue;
+					if (expectedSubValue.optional && (subValue === undefined || subValue === null)) continue;
 
 
 					let passed: boolean = expectedSubValueType === subValueType && subValue !== null && subValue !== undefined;
@@ -214,6 +222,64 @@ export class ECTValidator {
 	public doesFail(object: object): boolean {
 
 		return Object.keys(this.getFailures(object)).length > 0;
+
+	}
+
+	/**
+	 * Pretty print the inspection of an object using @elijahjcobb/console package.
+	 * @param {object} object The object to print the inspection of.
+	 */
+	public print(object: object): void {
+
+		ECConsole(this.inspect(object));
+
+	}
+
+	/**
+	 * Verify the object and throw an ECErrorStack instance if it is incorrect.
+	 * @param {object} object An object to inspect.
+	 */
+	public verify(object: object): void {
+
+		let fails: ECTOutput = this.getFailures(object);
+		let errorMessage: string[] = [];
+
+		let failingKeys: string[] = Object.keys(fails);
+		failingKeys.forEach((key: string) => {
+
+			let failingValue: ECTReport | {
+				passed: boolean;
+				children: ECTOutput;
+			} = fails[key];
+
+			if (failingValue["children"]) {
+
+				let value: {
+					passed: boolean;
+					children: ECTOutput;
+				} = failingValue as {
+					passed: boolean;
+					children: ECTOutput;
+				};
+
+				let childrenKeys: string[] = Object.keys(value.children);
+				childrenKeys.forEach((childKey: string) => {
+
+					let childValue: ECTReport = value.children[childKey] as ECTReport;
+					if (!childValue.passed) errorMessage.push(`Value '${childValue.data}' for key '${childKey}' in object '${key}' is incorrect type (expected: '${childValue.expected}' actual: '${childValue.actual}').`);
+
+				});
+
+			} else {
+
+				let value: ECTReport = failingValue as ECTReport;
+
+				errorMessage.push(`Value '${value.data}' for key '${key}' is incorrect type (expected: '${value.expected}' actual: '${value.actual}').`);
+			}
+
+		});
+
+		if (errorMessage.length > 0) throw ECErrorStack.newWithMessageAndType(ECErrorOriginType.FrontEnd, ECErrorType.ParameterIncorrectFormat, new Error(errorMessage.join(" ")));
 
 	}
 

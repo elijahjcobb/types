@@ -1,6 +1,6 @@
 {
   "name": "@elijahjcobb/types",
-  "version": "0.0.3",
+  "version": "0.0.11",
   "description": "A runtime type checker built with and for TypeScript.",
   "main": "dist/index",
   "types": "dist/index",
@@ -34,7 +34,10 @@
     "url": "https://github.com/elijahjcobb/types/issues"
   },
   "homepage": "https://github.com/elijahjcobb/types#readme",
-  "dependencies": {},
+  "dependencies": {
+    "@elijahjcobb/console": "latest",
+    "@elijahjcobb/error": "latest"
+  },
   "devDependencies": {
     "@types/node": "latest",
     "typescript": "latest",
