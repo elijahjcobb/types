@@ -24,24 +24,42 @@
 
 import { ECTItem, ECTValidator } from "./index";
 
-let validator: ECTValidator = new ECTValidator({
-	obj: ECTItem.object({
-		foo: ECTItem.string(true),
-		bar: ECTItem.number(),
-	}, false),
-	foo: ECTItem.string(),
-	nums: ECTItem.array([ECTItem.number()])
-});
+try {
 
+	let validator: ECTValidator = new ECTValidator({
+		arr: ECTItem.array([ECTItem.string()]),
+		str: ECTItem.string(),
+		boo: ECTItem.boolean(),
+		num: ECTItem.number(),
+		obj: ECTItem.object({
+			str: ECTItem.string(),
+			num: ECTItem.number()
+		}),
+		allObj: ECTItem.object({
+			"*": ECTItem.string()
+		})
+	});
 
-console.dir(validator.inspect({
-	obj: {
-		bar: 12
-	},
-	foo: "Hello",
-	nums: [
-		1,
-		2,
-		3
-	]
-}), { depth: null });
+	validator.verify({
+		arr: [
+			"Hello",
+			12
+		],
+		str: 2309,
+		boo: "fq23",
+		num: false,
+		obj: {
+			str: 12,
+			num: "f2elj"
+		},
+		allObj: {
+			foo: 89,
+			bar: 87123
+		}
+	});
+
+} catch (e) {
+
+	e.print();
+
+}

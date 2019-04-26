@@ -93,12 +93,12 @@ export declare class ECArray<T> extends ECPrototype implements ECArrayable<T> {
      * Convert this instance to a ECArray.
      * @return {string} This instance as a ECArray representation.
      */
-    toAFArray(): ECArray<T>;
+    toArray(): ECArray<T>;
     /**
      * Convert this instance to a ECArrayList.
      * @return {string} This instance as a ECArrayList representation.
      */
-    toAFArrayList(): ECArrayList<T>;
+    toArrayList(): ECArrayList<T>;
     /**
      * Create a new ECArray instance from specific values.
      * @param {T} values The values to add to the new instance.

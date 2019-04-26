@@ -1,6 +1,62 @@
 # Types
 A runtime type checker built with and for TypeScript.
 
+## Example
+```typescript
+try {
+
+	let validator: ECTValidator = new ECTValidator({
+		arr: ECTItem.array([ECTItem.string()]),
+		str: ECTItem.string(),
+		boo: ECTItem.boolean(),
+		num: ECTItem.number(),
+		obj: ECTItem.object({
+			str: ECTItem.string(),
+			num: ECTItem.number()
+		}),
+		allObj: ECTItem.object({
+			"*": ECTItem.string()
+		})
+	});
+
+	validator.verify({
+		arr: [
+			"Hello",
+			12
+		],
+		str: 2309,
+		boo: "fq23",
+		num: false,
+		obj: {
+			str: 12,
+			num: "f2elj"
+		},
+		allObj: {
+			foo: 89,
+			bar: 87123
+		}
+	});
+
+} catch (e) {
+
+	e.print();
+
+}
+
+
+/*
+
+Value '12' for key 'arr' is incorrect type (expected: 'array<string>' actual: 'array<number>').
+Value '2309' for key 'str' is incorrect type (expected: 'string' actual: 'number').
+Value 'fq23' for key 'boo' is incorrect type (expected: 'boolean' actual: 'string').
+Value 'false' for key 'num' is incorrect type (expected: 'number' actual: 'boolean').
+Value '12' for key 'str' in object 'obj' is incorrect type (expected: 'string' actual: 'number').
+Value 'f2elj' for key 'num' in object 'obj' is incorrect type (expected: 'number' actual: 'string').
+Value '89' for key 'foo' in object 'allObj' is incorrect type (expected: 'string' actual: 'number').
+
+*/
+```
+
 ## Import
 ```typescript
 import {

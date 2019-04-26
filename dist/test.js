@@ -24,22 +24,38 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 const index_1 = require("./index");
-let validator = new index_1.ECTValidator({
-    obj: index_1.ECTItem.object({
-        foo: index_1.ECTItem.string(true),
-        bar: index_1.ECTItem.number(),
-    }, false),
-    foo: index_1.ECTItem.string(),
-    nums: index_1.ECTItem.array([index_1.ECTItem.number()])
-});
-console.dir(validator.inspect({
-    obj: {
-        bar: 12
-    },
-    foo: "Hello",
-    nums: [
-        1,
-        2,
-        3
-    ]
-}), { depth: null });
+try {
+    let validator = new index_1.ECTValidator({
+        arr: index_1.ECTItem.array([index_1.ECTItem.string()]),
+        str: index_1.ECTItem.string(),
+        boo: index_1.ECTItem.boolean(),
+        num: index_1.ECTItem.number(),
+        obj: index_1.ECTItem.object({
+            str: index_1.ECTItem.string(),
+            num: index_1.ECTItem.number()
+        }),
+        allObj: index_1.ECTItem.object({
+            "*": index_1.ECTItem.string()
+        })
+    });
+    validator.verify({
+        arr: [
+            "Hello",
+            12
+        ],
+        str: 2309,
+        boo: "fq23",
+        num: false,
+        obj: {
+            str: 12,
+            num: "f2elj"
+        },
+        allObj: {
+            foo: 89,
+            bar: 87123
+        }
+    });
+}
+catch (e) {
+    e.print();
+}

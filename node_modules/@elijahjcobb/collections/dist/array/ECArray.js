@@ -128,14 +128,14 @@ class ECArray extends ECPrototype_1.ECPrototype {
      * Convert this instance to a ECArray.
      * @return {string} This instance as a ECArray representation.
      */
-    toAFArray() {
+    toArray() {
         return this;
     }
     /**
      * Convert this instance to a ECArrayList.
      * @return {string} This instance as a ECArrayList representation.
      */
-    toAFArrayList() {
+    toArrayList() {
         return ECArrayList_1.ECArrayList.initFromArray(this);
     }
     /**

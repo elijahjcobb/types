@@ -65,9 +65,10 @@ export class ECTValidator {
 			let actualValueType: string = typeof actualValue;
 			let isOptional: boolean = expectedValueType.optional;
 
+
 			if (actualValueType === "object" && Array.isArray(actualValue)) actualValueType = "array";
-			if (actualValueType === "array" && actualValue !== undefined && (actualValue as any[]).length === 0) actualValueType = "undefined";
-			if (actualValueType === "object" && actualValue !== undefined && (Object.keys(actualValue)).length === 0) actualValueType = "undefined";
+			if (actualValueType === "array" && actualValue === undefined) actualValueType = "undefined";
+			if (actualValueType === "object" && actualValue === undefined) actualValueType = "undefined";
 			if (isOptional && (actualValue === undefined || actualValue === null)) continue;
 			if (expectedValueType.type === "any" && actualValue !== undefined && actualValue !== null) continue;
 
@@ -96,7 +97,7 @@ export class ECTValidator {
 					let item: any = array[j];
 					let itemType: string = typeof item;
 
-					if (allowedTypes.indexOf(itemType) === -1) {
+					if (allowedTypes.indexOf(itemType) === -1 && allowedTypes.indexOf("any") === -1) {
 
 						res[key] = {
 							expected: expectedValueType.type + "<" + (expectedValueType.subtypes as string[]).join(" | ") + ">",
@@ -139,40 +140,103 @@ export class ECTValidator {
 
 				}
 
-				let objectKeys: string[] = Object.keys(actualValue);
-
 				let subRes: ECTOutput = {};
-
 				let passCount: number = 0;
 
-				for (let j: number = 0; j < objectKeys.length; j++) {
+				let expectedSubValues: ECTInput = (expectedValueType.subtypes as ECTInput);
+				let expectedSubValueKeys: string[] = Object.keys(expectedSubValues);
 
-					let subKey: string = objectKeys[j];
-					let subValue: any = actualValue[subKey];
-					let subValueType: string = typeof subValue;
-					let expectedSubValue: ECTItem = (expectedValueType.subtypes as ECTInput)[subKey];
-					let expectedSubValueType: string = expectedSubValue.type;
-					if (expectedSubValueType === "*" && subValue !== undefined && subValue !== null) continue;
-					if (expectedSubValue.optional && (subValue === undefined || subValue === null)) continue;
+				if (expectedSubValueKeys[0] === "*") {
+
+					let expectedSubValue: ECTItem = expectedSubValues["*"];
+
+					let realSubValueKeys: string[] = Object.keys(actualValue);
+
+					for (let k: number = 0; k < realSubValueKeys.length; k++) {
+
+						let realSubValueKey: string = realSubValueKeys[k];
+						let realSubValue: any = actualValue[realSubValueKey];
+						let realSubValueType: string = typeof realSubValue;
+
+						if (realSubValueType !== expectedSubValue.type) {
+
+							subRes[realSubValueKey] = {
+								expected: expectedSubValue.type,
+								data: realSubValue,
+								actual: realSubValueType,
+								passed: false
+							};
+
+							break;
+
+						}
+
+					}
+
+				} else {
+
+					for (let j: number = 0; j < expectedSubValueKeys.length; j++) {
+
+						let expectedSubValueKey: string = expectedSubValueKeys[j];
+						let expectedSubValue: ECTItem = expectedSubValues[expectedSubValueKey];
+
+						let realSubValue: any = actualValue[expectedSubValueKey];
+						let realSubValueType: string = typeof realSubValue;
+
+						if (expectedSubValue.optional && (realSubValue === undefined || realSubValue === null)) continue;
+						let expectedSubValueType: string = expectedSubValue.type;
 
 
-					let passed: boolean = expectedSubValueType === subValueType && subValue !== null && subValue !== undefined;
+						let passed: boolean = expectedSubValueType === realSubValueType && realSubValue !== null && realSubValue !== undefined;
 
-					subRes[subKey] = {
-						expected: expectedSubValueType,
-						data: subValue,
-						actual: subValueType,
-						passed
-					};
+						subRes[expectedSubValueKey] = {
+							expected: expectedSubValueType,
+							data: realSubValue,
+							actual: realSubValueType,
+							passed
+						};
 
-					if (passed) passCount ++;
+						if (passed) passCount ++;
+
+
+					}
 
 				}
 
 				res[key] = {
-					passed: passCount >= objectKeys.length,
+					passed: passCount >= expectedSubValueKeys.length,
 					children: subRes
 				};
+
+				// for (let j: number = 0; j < objectKeys.length; j++) {
+				//
+				// 	let subKey: string = objectKeys[j];
+				// 	let subValue: any = actualValue[subKey];
+				// 	let subValueType: string = typeof subValue;
+				// 	let expectedSubValue: ECTItem = (expectedValueType.subtypes as ECTInput)[subKey];
+				// 	if (!expectedSubValue) expectedSubValue = (expectedValueType.subtypes as ECTInput)["*"];
+				// 	if (expectedSubValue.optional && (subValue === undefined || subValue === null)) continue;
+				// 	let expectedSubValueType: string = expectedSubValue.type;
+				// 	if (expectedSubValueType === "*" && subValue !== undefined && subValue !== null) continue;
+				//
+				//
+				// 	let passed: boolean = expectedSubValueType === subValueType && subValue !== null && subValue !== undefined;
+				//
+				// 	subRes[subKey] = {
+				// 		expected: expectedSubValueType,
+				// 		data: subValue,
+				// 		actual: subValueType,
+				// 		passed
+				// 	};
+				//
+				// 	if (passed) passCount ++;
+				//
+				// }
+				//
+				// res[key] = {
+				// 	passed: passCount >= objectKeys.length,
+				// 	children: subRes
+				// };
 
 			} else {
 

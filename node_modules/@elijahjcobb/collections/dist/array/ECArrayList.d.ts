@@ -93,12 +93,12 @@ export declare class ECArrayList<T> extends ECPrototype implements ECArrayable<T
      * Convert this instance to a ECArray.
      * @return {string} This instance as a ECArray representation.
      */
-    toAFArray(): ECArray<T>;
+    toArray(): ECArray<T>;
     /**
      * Convert this instance to a ECArrayList.
      * @return {string} This instance as a ECArrayList representation.
      */
-    toAFArrayList(): ECArrayList<T>;
+    toArrayList(): ECArrayList<T>;
     /**
      * Insert a value at a specific index.
      * @param {T} value The value to be inserted.
@@ -129,6 +129,11 @@ export declare class ECArrayList<T> extends ECPrototype implements ECArrayable<T
      * @param {T} value The value to be removed.
      */
     removeValue(value: T): void;
+    /**
+     * Merge with another list instance.
+     * @param {ECArrayList<T>} otherList Another list of the same type.
+     */
+    merge(otherList: ECArrayList<T>): void;
     /**
      * Create a new ECArrayList instance from specific values.
      * @param {T} values The values to add to the new instance.

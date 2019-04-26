@@ -128,14 +128,14 @@ class ECArrayList extends ECPrototype_1.ECPrototype {
      * Convert this instance to a ECArray.
      * @return {string} This instance as a ECArray representation.
      */
-    toAFArray() {
+    toArray() {
         return ECArray_1.ECArray.initFromNativeArray(this.array);
     }
     /**
      * Convert this instance to a ECArrayList.
      * @return {string} This instance as a ECArrayList representation.
      */
-    toAFArrayList() {
+    toArrayList() {
         return this;
     }
     /**
@@ -179,6 +179,13 @@ class ECArrayList extends ECPrototype_1.ECPrototype {
      */
     removeValue(value) {
         this.remove(this.indexOf(value));
+    }
+    /**
+     * Merge with another list instance.
+     * @param {ECArrayList<T>} otherList Another list of the same type.
+     */
+    merge(otherList) {
+        otherList.forEach((value) => this.add(value));
     }
     /**
      * Create a new ECArrayList instance from specific values.
